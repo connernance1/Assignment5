@@ -7,8 +7,10 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
@@ -19,6 +21,7 @@ import javafx.scene.shape.Arc;
 import javafx.scene.shape.Line;
 import javafx.scene.layout.Pane;
 import javafx.scene.Node;
+import javafx.scene.text.Text;
 
 import javafx.scene.image.*;
 
@@ -104,8 +107,35 @@ public class Main extends Application {
         body.add(rightLeg);
     }
 
-    private 
+    private void blanks(String phrase) {
+        Line[] notFound = new Line[phrase.length()];
+        int xStart = 375;
+        int lineLength = 25;
+        int lineSpacing = 35;
+        for (int i = 0; i < notFound.length; i++) {
+            int xPos = xStart + (lineSpacing * i);
 
+            notFound[i] = new Line(xPos, 225, xPos - lineLength, 225);
+            notFound[i]. setStrokeWidth(3);
+            children.add(notFound[i]);
+        }
+    }
+
+
+    private Text[] Phrase(String phrase) {
+        Text[] text = new Text[phrase.length()];
+        int xStart = 355;
+        int spaceing = 35;
+        for(int i = 0; i < text.length; i++){
+            int xPos = xStart + (spaceing * i);
+            text[i] = new Text(phrase.substring(i, i + 1));
+            text[i].setX(xPos);
+            text[i].setY(220);
+            text[i].setVisible(false);
+            children.add(text[i]);
+        }
+        return text;
+    }
 
 
     @Override
@@ -133,7 +163,9 @@ public class Main extends Application {
 
         //initialize empty game
         gallow();
+        body();
 
+        phrase = Phrase(phraseList[0]);
         BorderPane bp = new BorderPane();
 
         bp.setCenter(pane);
