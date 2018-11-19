@@ -14,16 +14,19 @@ import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polyline;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.Line;
 import javafx.scene.layout.Pane;
 import javafx.scene.Node;
 
+import javafx.scene.image.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileNotFoundException;
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.geom.Ellipse2D;
+import java.io.*;
+//import java.ImageIO.read;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -57,6 +60,51 @@ public class Main extends Application {
 
     }
 
+
+    void body() throws IOException {
+        ArrayList body = new ArrayList<Shape>();
+        //Will need to add image right here eventually
+        Circle head = new Circle(200, 112,35,Color.WHITE);
+//        Image image = new Image("Assingment5/boise.png");
+//        image = ImageIO.read(getClass().getResource("/Assignment5/boise.png"));
+//        head.setFill(new ImagePattern(image));
+        head.setStrokeWidth(5);
+        head.setVisible(false);
+        children.add(head);
+        body.add(head);
+
+        Line spine = new Line(200, 200, 200, 150);
+        spine.setStrokeWidth(5);
+        spine.setVisible(false);
+        children.add(spine);
+        body.add(spine);
+
+        Line leftArm = new Line(150,225,200,175);
+        leftArm.setStrokeWidth(5);
+        leftArm.setVisible(false);
+        children.add(leftArm);
+        body.add(head);
+
+        Line rightArm = new Line(250,225,200, 175);
+        rightArm.setStrokeWidth(5);
+        rightArm.setVisible(false);
+        children.add(rightArm);
+        body.add(rightArm);
+
+        Line leftLeg = new Line(200, 200, 175, 275);
+        leftLeg.setStrokeWidth(5);
+        leftLeg.setVisible(false);
+        children.add(leftLeg);
+        body.add(leftLeg);
+
+        Line rightLeg = new Line(200, 200, 225, 275);
+        rightLeg.setStrokeWidth(5);
+        rightLeg.setVisible(false);
+        children.add(rightLeg);
+        body.add(rightLeg);
+    }
+
+    private 
 
 
 
