@@ -2,41 +2,46 @@ package sample;
 
 
 
+
 import javafx.application.Application;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.text.Font;
+
 import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Polyline;
-import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.Line;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Shape;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+//import javafx.scene.control.Alert.ButtonType;
+import javafx.scene.control.ButtonType;
+//import javafx.scene.control.Alert.AlertType.Information;
 import javafx.scene.Node;
 import javafx.scene.text.Text;
 
 import javafx.scene.image.*;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.geom.Ellipse2D;
 import java.io.*;
-//import java.ImageIO.read;
-import java.util.List;
 import java.util.ArrayList;
 
 
 public class Main extends Application {
 
 
+    private TextField GuessLetter = new TextField();
+    private TextField GuessedLetters = new TextField();
+    StringBuilder history = new StringBuilder();
+    boolean valid = false;
+    boolean WonGame = false;
+    Text[] phrase = new Text[1];
+    private int movesTaken = 5;
+    ArrayList<Shape> body = new ArrayList<>();
 
     ObservableList<Node> children;
     void gallow() {
@@ -65,7 +70,7 @@ public class Main extends Application {
 
 
     void body() throws IOException {
-        ArrayList body = new ArrayList<Shape>();
+
         //Will need to add image right here eventually
         Circle head = new Circle(200, 112,35,Color.WHITE);
 //        Image image = new Image("Assingment5/boise.png");
@@ -86,7 +91,7 @@ public class Main extends Application {
         leftArm.setStrokeWidth(5);
         leftArm.setVisible(false);
         children.add(leftArm);
-        body.add(head);
+        body.add(leftArm);
 
         Line rightArm = new Line(250,225,200, 175);
         rightArm.setStrokeWidth(5);
@@ -107,15 +112,15 @@ public class Main extends Application {
         body.add(rightLeg);
     }
 
-    private void blanks(String phrase) {
+    private void addLine(String phrase) {
         Line[] notFound = new Line[phrase.length()];
-        int xStart = 375;
-        int lineLength = 25;
-        int lineSpacing = 35;
+        int xStart = 28;
+        int lineLength = 7;
+        int lineSpacing = 15;
         for (int i = 0; i < notFound.length; i++) {
             int xPos = xStart + (lineSpacing * i);
 
-            notFound[i] = new Line(xPos, 225, xPos - lineLength, 225);
+            notFound[i] = new Line(xPos, 505, xPos - lineLength, 505);
             notFound[i]. setStrokeWidth(3);
             children.add(notFound[i]);
         }
@@ -124,15 +129,33 @@ public class Main extends Application {
 
     private Text[] Phrase(String phrase) {
         Text[] text = new Text[phrase.length()];
-        int xStart = 355;
-        int spaceing = 35;
+        int xStart = 10;
+        int spaceing = 10;
+        int count = 0;
         for(int i = 0; i < text.length; i++){
+            if(phrase.substring(i) == "" && count > 10 ){
+                int xPos = xStart + (spaceing * i);
+                text[i] = new Text(phrase.substring(i, i + 1));
+                text[i].setX(xPos);
+                text[i].setY(800);
+                text[i].setVisible(false);
+                children.add(text[i]);
+
+                count = 0;
+            }
             int xPos = xStart + (spaceing * i);
             text[i] = new Text(phrase.substring(i, i + 1));
             text[i].setX(xPos);
-            text[i].setY(220);
-            text[i].setVisible(false);
+            text[i].setY(500);
             children.add(text[i]);
+            if(phrase.substring(i) == ""){
+                text[i].setVisible(true);
+            }
+            else{
+                text[i].setVisible(false);
+            }
+
+            count++;
         }
         return text;
     }
@@ -146,14 +169,14 @@ public class Main extends Application {
         BufferedReader br = new BufferedReader(fileReader);
         StringBuffer stringBuffer = new StringBuffer();
         String line;
-        List<String> phraseList = new ArrayList<String>();
+        ArrayList<String> phraseList = new ArrayList<String>();
         while((line = br.readLine()) != null) {
             phraseList.add(line);
             stringBuffer.append(line);
             stringBuffer.append("\n");
         }
         fileReader.close();
-        System.out.println(stringBuffer.toString());
+//        System.out.println(stringBuffer.toString());
 
         Pane pane = new Pane();
         children = pane.getChildren();
@@ -165,13 +188,38 @@ public class Main extends Application {
         gallow();
         body();
 
-        phrase = Phrase(phraseList[0]);
+        addLine(phraseList.get(0));
+        System.out.println(phraseList.get(0));
+
+
+        phrase = Phrase(phraseList.get(0));
+        System.out.println(phraseList.get(0));
         BorderPane bp = new BorderPane();
 
+
+
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(5);
+        gridPane.setVgap(5);
+        TextField textField = new TextField();
+//        Label label1 = new Label("Please Enter A Letter");
+
+        gridPane.add(new Label("Please Enter A Letter"), 0, 0);
+//        HorizontalBox horizontalBox = new HorizontalBox();
+//        gridPane.getChildren().add(textField);
+        gridPane.add(GuessLetter, 1, 0);
+
+        gridPane.add(new Label("Incorrect Guesses"), 0, 1);
+        gridPane.add(GuessedLetters, 1, 1);
+
+
+
+
         bp.setCenter(pane);
+        bp.setRight(gridPane);
         Scene scene = new Scene(bp, 600,600);
 
-
+        GuessLetter.setOnAction(event -> HangMan());
 
         boolean game = true;
             primaryStage.setTitle("Welcome to Hangman");
@@ -184,4 +232,120 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
+
+
+
+
+
+
+
+    private void HangMan() {
+        String guess = GuessLetter.getText().toString();
+        if(guess.length() == 0) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Input Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Please enter more than a valid Character.");
+            alert.showAndWait();
+            return;
+        }
+        else if(guess.length() >= 1) {
+            guess = guess.substring(0, 1);
+        }
+        GuessLetter.setText("");
+
+        if(history.length() > 0) {
+
+            if(history.indexOf(guess) > -1){
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Guess Error");
+                alert.setHeaderText(null);
+                alert.setContentText("This Character Has Already been Guessed");
+                alert.showAndWait();
+                return;
+            } else {
+                history.append(guess);
+            }
+        } else {
+            history.append(guess);
+        }
+//        GuessedLetters.setText(history.toString());
+        Boolean temp;
+        temp = Character.isUpperCase(guess.charAt(0));
+        for(int i = 0; i < phrase.length; i++) {
+            String letter;
+            letter = phrase[i].getText();
+            if(guess.equals(letter)) {
+                phrase[i].setVisible(true);
+                valid = true;
+            }
+            else if (temp == true && guess.toLowerCase().equals(letter)){
+                phrase[i].setVisible(true);
+                valid = true;
+            }
+            else if(temp == false && guess.toUpperCase().equals(letter)){
+                phrase[i].setVisible(true);
+                valid = true;
+            }
+
+        }
+
+        if(valid == false) {
+//            """Set TO VISIBLE --- FIGURE OUT HOW TO DELIMIT VISIBLE ELEMENT"""
+
+            body.get(5 - movesTaken).setVisible(true);
+            GuessedLetters.setText(history.toString());
+
+            movesTaken--;
+        }
+
+        if(movesTaken == 0) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("GAME Lost");
+            alert.setHeaderText(null);
+            alert.setContentText("YOU LOST THE GAME... This Wasn't even that hard... \n Try Doing this again and not sucking.");
+            ButtonType yesbutton = new ButtonType("Play Again");
+            alert.getButtonTypes().add(yesbutton);
+            ButtonType nobutton = new ButtonType("Nah Im good Fam");
+            alert.getButtonTypes().add(nobutton);
+            return;
+        }
+
+        for(int i = 0; i < phrase.length; i++) {
+            if(!phrase[i].isVisible()){
+                WonGame = false;
+                break;
+            }
+        }
+
+        if(WonGame) {
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("GAME WON");
+            alert.setHeaderText(null);
+            alert.setContentText("CONGRATS! YOU WON THE GAME!!");
+            ButtonType yesbutton = new ButtonType("Play Again");
+            alert.getButtonTypes().add(yesbutton);
+            ButtonType nobutton = new ButtonType("Nah Im good Fam");
+            alert.getButtonTypes().add(nobutton);
+//            Optional<ButtonType> result = alert.showAndWait();
+//            if(result.get() == yesbutton){
+//                movesTaken = 6;
+//                WonGame = false;
+//
+//            }
+//            alert.showAndWait();
+            return;
+        }
+
+
+
+    }
+
 }
+
+
+
+
+
+
